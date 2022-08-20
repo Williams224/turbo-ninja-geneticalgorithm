@@ -20,7 +20,7 @@ class FPLTeam:
                 "Need to add reference data to class before initialising any instances from chromosone"
             )
         self.chromosone = chromosone
-        self.fitness_score = self.calc_fitness()
+        self.fitness_score = self.calc_fitness()  #
 
     def calc_fitness(self):
         if len(set(self.chromosone)) != 15:
