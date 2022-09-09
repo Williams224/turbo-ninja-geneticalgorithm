@@ -11,7 +11,8 @@ def calc_iteration_stats(population):
         "fitness_median": np.median(fitness_scores),
         "best_solution_score": np.max(fitness_scores),
     }
-    return stats_dict
+    
+    return stats_dict, np.argmax(fitness_scores)
 
 
 class GeneticAlgorithm:
@@ -56,9 +57,12 @@ class GeneticAlgorithm:
             self.pop_size = len(self.population)
             for i in self.population:
                 add_mutations(i)
-            iteration_stats = calc_iteration_stats(self.population)
+            iteration_stats, best_chromosone_index = calc_iteration_stats(self.population)
+            best_chromosone = self.population[best_chromosone_index]
             if iteration_stats["best_solution_score"] > best_best_score:
                 best_best_score = iteration_stats["best_solution_score"]
+                self.best_best_chromosone = best_chromosone
             print(
                 f"After {n} iterations stats are {iteration_stats}, best_best_score = {best_best_score}"
             )
+            print(self.best_best_chromosone.chromosone)

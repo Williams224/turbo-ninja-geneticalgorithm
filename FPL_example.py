@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+from c_utils import list_sum
 from turbo_ninja_ga.genetic_algorithm import GeneticAlgorithm
 from turbo_ninja_ga.utils import fast_random_choice
 
@@ -25,14 +26,12 @@ class FPLTeam:
     def calc_fitness(self):
         if len(set(self.chromosone)) != 15:
             return 0.0
-        self.team_cost = np.sum(
-            np.array([self.full_data[id]["now_cost"] for id in self.chromosone])
+        self.team_cost = list_sum(
+            [self.full_data[id]["value"] for id in self.chromosone]
         )
-        if self.team_cost > 1000:
+        if self.team_cost > 1000:   
             return 0.0
-        return np.sum(
-            np.array([self.full_data[id]["total_points"] for id in self.chromosone])
-        )
+        return list_sum([self.full_data[id]["season_points"] for id in self.chromosone])
 
     def mutate_position(self, pos):
         if pos > len(self.chromosone) - 1:
@@ -56,10 +55,23 @@ def generate_chromosone(gks, defs, mids, fwds):
     return gk_list + defs_list + mids_list + fwds_list
 
 
+def decode_chromosonse(chromosone, full_data):
+    names = [full_data[x]["name"] for x in chromosone]
+    return names
+
+
 if __name__ == "__main__":
 
-    df = pd.read_csv("/Users/TimothyW/Fun/genetic_algorithm/fpl_player_data.csv")
-    df["player_id"] = df.index
+    df = pd.read_csv("/Users/TimothyW/Fun/genetic_algorithm/lastest_gw_data.csv")
+    df["season_points"] = (
+        df.sort_values("GW")
+        .groupby("element")["total_points"]
+        .transform(lambda x: x.expanding(1).sum())
+    )
+    df["player_id"] = df.element
+    df["element_type"] = df.position
+    df.index = df["player_id"]
+    df = df[df.GW == 4]
 
     gks = df[df.element_type == "GK"]
     defs = df[df.element_type == "DEF"]
@@ -81,6 +93,8 @@ if __name__ == "__main__":
     GA = GeneticAlgorithm(population)
 
     GA.run(1000)
+
+    print(decode_chromosonse(GA.best_best_chromosone.chromosone, FPLTeam.full_data))
 
     # GA.get_best_solution
 
