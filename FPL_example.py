@@ -29,7 +29,7 @@ class FPLTeam:
         self.team_cost = list_sum(
             [self.full_data[id]["value"] for id in self.chromosone]
         )
-        if self.team_cost > 1000:   
+        if self.team_cost > 1000:
             return 0.0
         return list_sum([self.full_data[id]["season_points"] for id in self.chromosone])
 
